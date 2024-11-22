@@ -1,9 +1,10 @@
 name: air-quality-daily
 
 on:
-  workflow_dispatch:  
-  schedule:
-    - cron: '11 6 * * *'  
+  workflow_dispatch:
+    schedule:
+    - cron: '11 6 * * *'
+
 jobs:
   schedule_pipelines:
     runs-on: ubuntu-latest
@@ -14,31 +15,24 @@ jobs:
 
     steps:
       - name: checkout repo content
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           cache: 'pip'
-
-     
       - name: install python packages
         run: |
+          cd notebooks/ch03
           python -m pip install --upgrade pip
-          pip install hopsworks
-          pip install geopy==2.4.1
-          pip install openmeteo-requests
-          pip install requests-cache==1.2.0
-          pip install retry-requests==2.0.0
-          pip install xgboost==2.0.3
-          pip install scikit-learn==1.4.1.post1
-          pip install matplotlib==3.8.3
+          pip install -r requirements.txt
 
       - name: execute python workflows from bash script
         env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
         run: |
+          cd notebooks/ch03
           jupyter nbconvert --to notebook --execute 2_air_quality_feature_pipeline.ipynb
           jupyter nbconvert --to notebook --execute 4_air_quality_batch_inference.ipynb
 
@@ -47,10 +41,17 @@ jobs:
         with:
           commit_message: "Air Quality Dashboard published"
           commit_options: '--no-verify --signoff'
+
           file_pattern: 'docs/air-quality/assets/img/* docs/_includes/*'
+
           repository: .
+
           status_options: '--untracked-files=no'
+
           skip_dirty_check: true
-          skip_fetch: false  
-          skip_checkout: false 
+
+          skip_fetch: true
+
+          skip_checkout: true
+
           push_options: '--force'
