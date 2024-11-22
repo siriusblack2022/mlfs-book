@@ -32,8 +32,8 @@ jobs:
       - name: verify files before execution
         run: |
           cd notebooks/ch03
-          pwd  # 确认当前目录
-          ls -la  # 列出当前目录下的所有文件
+          pwd  
+          ls -la  
 
       - name: execute python workflows from bash script
         env:
